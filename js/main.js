@@ -1,79 +1,85 @@
-const form = document.getElementById("novoItem")
-const lista = document.getElementById("lista")
-const itens = JSON.parse(localStorage.getItem("itens")) || []
+const form = document.querySelector("#novoItem")
+const lista = document.querySelector("#lista")
+const itens = JSON.parse(localStorage.getItem("listaViagem")) ||  []
 
-itens.forEach( (elemento) => {
-    criaElemento(elemento)
-} )
-
+const carregarItens = (itens) =>{
+    itens.forEach(item => {
+        criarElemento(item)
+    });
+}
+     
 form.addEventListener("submit", (evento) => {
     evento.preventDefault()
-
-    const nome = evento.target.elements['nome']
-    const quantidade = evento.target.elements['quantidade']
-
-    const existe = itens.find( elemento => elemento.nome === nome.value )
-
-    const itemAtual = {
-        "nome": nome.value,
+    
+    const nome = evento.target.elements["nome"]
+    const quantidade = evento.target.elements["quantidade"]
+    
+    const item = {
+        "nome": nome.value, 
         "quantidade": quantidade.value
     }
 
-    if (existe) {
-        itemAtual.id = existe.id
-        
-        atualizaElemento(itemAtual)
+    let existeItem = itens.find(elemento => elemento.nome == item.nome)
 
-        itens[itens.findIndex(elemento => elemento.id === existe.id)] = itemAtual
+    if (existeItem) {
+        atualizarElemento(item)
+        atualizarItem(item)
     } else {
-        itemAtual.id = itens[itens.length -1] ? (itens[itens.length-1]).id + 1 : 0;
-
-        criaElemento(itemAtual)
-
-        itens.push(itemAtual)
+        criarElemento(item)
+        gravarItem(item)
     }
-
-    localStorage.setItem("itens", JSON.stringify(itens))
 
     nome.value = ""
     quantidade.value = ""
 })
 
-function criaElemento(item) {
-    const novoItem = document.createElement("li")
-    novoItem.classList.add("item")
+const gravarItem = (item) => {
+    itens.push(item)
+    localStorage.setItem("listaViagem", JSON.stringify(itens))
+}
 
-    const numeroItem = document.createElement("strong")
-    numeroItem.innerHTML = item.quantidade
-    numeroItem.dataset.id = item.id
-    novoItem.appendChild(numeroItem)
-    
+const atualizarItem = (item) => {
+    itens[itens.findIndex(elemento => elemento.nome == item.nome)] = item
+    localStorage.setItem("listaViagem", JSON.stringify(itens))
+}
+
+const excluirItem = (item) => {
+    itens.splice(itens.findIndex(elemento => elemento.nome === item), 1)
+    localStorage.setItem("listaViagem", JSON.stringify(itens))
+}
+
+const atualizarElemento = (item) => {
+    elemento = document.querySelector("[data-id='"+item.nome+"']")
+    elemento.innerHTML = item.quantidade
+}
+
+const excluirElemento = (item) => {
+    item.remove()
+}
+
+const criarElemento = (item) => {
+    const novoItem = document.createElement("li")
+    novoItem.classList.add("item", "teste")
+
+    const idItem = document.createElement("strong")
+    idItem.innerHTML = item.quantidade
+    idItem.dataset.id = item.nome
+
+    novoItem.appendChild(idItem)
     novoItem.innerHTML += item.nome
 
-    novoItem.appendChild(botaoDeleta(item.id))
-
+    novoItem.appendChild(criarBotaoExcluir(item))
     lista.appendChild(novoItem)
 }
 
-function atualizaElemento(item) {
-    document.querySelector("[data-id='"+item.id+"']").innerHTML = item.quantidade
-}
-
-function botaoDeleta(id) {
-    const elementoBotao = document.createElement("button")
-    elementoBotao.innerText = "X"
-
-    elementoBotao.addEventListener("click", function() {
-        deletaElemento(this.parentNode, id)
+const criarBotaoExcluir = (item) => {
+    const botaoExcluir = document.createElement("button")
+    botaoExcluir.innerText = "X"
+    botaoExcluir.addEventListener("click", function() {
+        excluirElemento(this.parentNode)
+        excluirItem(item.nome)
     })
-
-    return elementoBotao
+    return botaoExcluir
 }
 
-function deletaElemento(tag, id) {
-    tag.remove()
-
-    itens.splice(itens.findIndex(elemento => elemento.id === id), 1)
-
-    localStorage.setItem("itens", JSON.stringify(itens))
-}
+carregarItens(itens)
