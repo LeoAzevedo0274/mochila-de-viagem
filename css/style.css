@@ -21,6 +21,7 @@ html {
     background: #C5965F;
     border-radius: 10px;
     gap: 2em;
+    justify-content: space-between;
 }
   
 .mochila {
