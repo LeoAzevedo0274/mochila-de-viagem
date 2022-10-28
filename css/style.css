@@ -21,7 +21,6 @@ html {
     background: #C5965F;
     border-radius: 10px;
     gap: 2em;
-    justify-content: space-between;
 }
   
 .mochila {
@@ -118,6 +117,7 @@ html {
     align-items: center;
     gap: 1em;
     font-size: 20px;
+    justify-content: space-between;
 }
 
 .item strong {
